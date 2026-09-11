@@ -1,0 +1,7 @@
+{
+    "python": "Python is a programming language used to build AI applications.",
+    "llm": "An LLM is a large language model that processes and generates text.",
+    "vector database": "A vector database stores vectors and searches for similar ones.",
+    "pytorch": "PyTorch is a framework for building and training neural networks.",
+    "embedding": "An embedding represents data as a list of numbers that captures useful features, including aspects of meaning."
+}

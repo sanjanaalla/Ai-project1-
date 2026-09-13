@@ -1,8 +1,19 @@
+import argparse
 import json
 from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient, models
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "--refresh",
+    action="store_true",
+    help="Rebuild the saved collection from notes.json"
+)
+
+args = parser.parse_args()
 
 # Load study notes.
 notes_path = Path(__file__).with_name("notes.json")
@@ -26,6 +37,9 @@ database_path = Path(__file__).with_name("qdrant_data")
 
 client = QdrantClient(path=str(database_path))
 
+if args.refresh and client.collection_exists("study_notes"):
+    client.delete_collection("study_notes")
+    print("Removed the old collection. Rebuilding from notes.json...")
 if not client.collection_exists("study_notes"):
     print("Creating embeddings and saving notes...")
 

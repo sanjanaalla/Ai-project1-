@@ -3,5 +3,6 @@
     "llm": "An LLM is a large language model that processes and generates text.",
     "vector database": "A vector database stores vectors and searches for similar ones.",
     "pytorch": "PyTorch is a framework for building and training neural networks.",
+    "rag": "Retrieval-augmented generation (RAG) retrieves relevant information and provides it to a language model to help generate an answer.",
     "embedding": "An embedding represents data as a list of numbers that captures useful features, including aspects of meaning."
 }

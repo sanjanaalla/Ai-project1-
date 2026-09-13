@@ -21,41 +21,47 @@ model = SentenceTransformer(
     "sentence-transformers/all-MiniLM-L6-v2",
     device="cpu"
 )
+# Save the database beside this Python file.
+database_path = Path(__file__).with_name("qdrant_data")
 
-embeddings = model.encode(texts)
+client = QdrantClient(path=str(database_path))
 
-# Create an in-memory vector database.
-client = QdrantClient(":memory:")
+if not client.collection_exists("study_notes"):
+    print("Creating embeddings and saving notes...")
 
-client.create_collection(
-    collection_name="study_notes",
-    vectors_config=models.VectorParams(
-        size=embeddings.shape[1],
-        distance=models.Distance.COSINE
+    embeddings = model.encode(texts)
+
+    client.create_collection(
+        collection_name="study_notes",
+        vectors_config=models.VectorParams(
+            size=embeddings.shape[1],
+            distance=models.Distance.COSINE
+        )
     )
-)
 
-# Store each embedding with its topic and original text.
-points = []
+    points = []
 
-for index, text in enumerate(texts):
-    point = models.PointStruct(
-        id=index,
-        vector=embeddings[index].tolist(),
-        payload={
-            "topic": topics[index],
-            "text": text
-        }
+    for index, text in enumerate(texts):
+        point = models.PointStruct(
+            id=index,
+            vector=embeddings[index].tolist(),
+            payload={
+                "topic": topics[index],
+                "text": text
+            }
+        )
+        points.append(point)
+
+    client.upsert(
+        collection_name="study_notes",
+        points=points,
+        wait=True
     )
-    points.append(point)
 
-client.upsert(
-    collection_name="study_notes",
-    points=points,
-    wait=True
-)
+    print(f"Saved {len(points)} notes.")
+else:
+    print("Using the saved note embeddings.")
 
-print(f"Stored {len(points)} notes in Qdrant.")
 
 while True:
     question = input("\nYour question (or exit): ").strip()
